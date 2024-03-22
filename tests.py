@@ -35,8 +35,8 @@ def run_test(selected_model, train_ds, valid_ds, test_ds, augumentation, optimiz
     ])
 
     loss_history_callback = LossHistory(
-        file_path=f'{model_name}_batch_{test_name}.csv',
-        val_file_path=f'{model_name}_epoch_{test_name}.csv'
+        file_path=f'../results/{model_name}_batch_{test_name}.csv',
+        val_file_path=f'../results/{model_name}_epoch_{test_name}.csv'
     )
 
     model.compile(loss="categorical_crossentropy", optimizer=optimizer, metrics=["accuracy"])
@@ -48,6 +48,6 @@ def run_test(selected_model, train_ds, valid_ds, test_ds, augumentation, optimiz
         callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=3), loss_history_callback])
     _, test_acc = model.evaluate(test_ds)
     print("Test accuracy: {:.2f}%".format(test_acc * 100))
-    model.save(f'{model_name}_{test_name}.h5')
+    model.save(f'../models/{model_name}_{test_name}.h5')
 
 
