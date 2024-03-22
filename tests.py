@@ -26,11 +26,15 @@ class LossHistory(tf.keras.callbacks.Callback):
             file.write(f"{epoch},{logs['loss']},{logs['accuracy']}, {logs['val_loss']},{logs['val_accuracy']}\n")
 
 
-def run_test(selected_model, train_ds, valid_ds, test_ds, augumentation, optimizer, batch_size, model_name, test_name):
+def run_test(selected_model, train_ds, valid_ds, test_ds, model_name, test_name,
+             augumentation=tf.keras.layers.Identity(),
+             optimizer=tf.keras.optimizers.Adam(), batch_size=16,
+             dropout=tf.keras.layers.Identity()):
     model = tf.keras.Sequential([
         tf.keras.layers.Resizing(224, 224),
         augumentation,
         selected_model,
+        dropout,
         tf.keras.layers.Dense(10, activation='softmax')
     ])
 
