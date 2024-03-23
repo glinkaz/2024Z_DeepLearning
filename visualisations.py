@@ -1,9 +1,16 @@
 import plotly.graph_objs as go
+import plotly.express as px
 from plotly.subplots import make_subplots
 import matplotlib.pyplot as plt
 
 
-def plot_batch_training(dfs, trace_names, colors):
+def plot_batch_training(dfs, trace_names, title):
+    min_epoch = min(df['Epoch'].min() for df in dfs)
+    max_epoch = max(df['Epoch'].max() for df in dfs)
+    max_y = max([df[[' Accuracy', ' Accuracy_valid']].max().max() for df in dfs])
+    min_y = min([df[[' Accuracy', ' Accuracy_valid']].min().min() for df in dfs])
+    colors = px.colors.qualitative.Plotly
+
     fig = make_subplots(rows=1, cols=2, subplot_titles=("Accuracy Plot", "Validation Accuracy Plot"))
     for i, (df, trace_name) in enumerate(zip(dfs, trace_names)):
         color = colors[i]
@@ -13,16 +20,11 @@ def plot_batch_training(dfs, trace_names, colors):
         fig.add_trace(go.Scatter(x=df['Epoch'], y=df[' Accuracy_valid'], mode='lines', name=f'Gaussian Noise 0.{i + 1}',
                                  showlegend=False, line=dict(color=color)), row=1, col=2)
 
-    fig.update_xaxes(title_text="Epoch", row=1, col=1)
-    fig.update_xaxes(title_text="Epoch", row=1, col=2)
-    fig.update_yaxes(title_text="Accuracy", row=1, col=1)
-    fig.update_yaxes(title_text="Validation Accuracy", row=1, col=2)
-
-    max_y = max([df[[' Accuracy', ' Accuracy_valid']].max().max() for df in dfs])
-    min_y = max([df[[' Accuracy', ' Accuracy_valid']].min().min() for df in dfs])
-    fig.update_yaxes(range=[min_y, max_y], row=1, col=1)
-    fig.update_yaxes(range=[min_y, max_y], row=1, col=2)
-
+    fig.update_xaxes(title_text="Epoch", row=1, col=1, range=[min_epoch, max_epoch])
+    fig.update_xaxes(title_text="Epoch", row=1, col=2, range=[min_epoch, max_epoch])
+    fig.update_yaxes(title_text="Accuracy", row=1, col=1, range=[min_y, max_y])
+    fig.update_yaxes(title_text="Validation Accuracy", row=1, col=2, range=[min_y, max_y])
+    fig.update_layout(title_text=title)
     fig.show()
 
 
