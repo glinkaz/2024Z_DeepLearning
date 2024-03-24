@@ -2,6 +2,9 @@ import plotly.graph_objs as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 import matplotlib.pyplot as plt
+import os
+import pandas as pd
+import seaborn as sns
 
 
 def plot_batch_training(dfs, trace_names, title):
@@ -85,3 +88,49 @@ def plot_mixup(ds):
     plt.axis('off')
 
     plt.show()
+
+
+def accuracy_boxplot(my_dir, name):
+    df = merge_dfs(my_dir, name)
+
+    fig, axs = plt.subplots(1, 2, figsize=(15, 6))
+    sns.boxplot(x='Epoch', y=' Accuracy', data=df, ax=axs[0])
+    axs[0].set_title('Accuracy for training set')
+    axs[0].set_xlabel('epoch')
+    axs[0].set_ylabel('accuracy')
+
+    sns.boxplot(x='Epoch', y=' Accuracy_valid', data=df, ax=axs[1])
+    axs[1].set_title('Accuracy for validation set')
+    axs[1].set_xlabel('epoch')
+    axs[1].set_ylabel('validation accuracy')
+
+    plt.tight_layout()
+    plt.show()
+
+
+def accuracy_lineplot(my_dir, name):
+    df = merge_dfs(my_dir, name)
+    fig, axs = plt.subplots(1, 2, figsize=(15, 6))
+
+    sns.lineplot(x='Epoch', y=' Accuracy', data=df, errorbar='sd', ax=axs[0])
+    axs[0].set_title('Accuracy with standard deviation on training set')
+    axs[0].set_xlabel('epoch')
+    axs[0].set_ylabel('training accuracy')
+
+    sns.lineplot(x='Epoch', y=' Accuracy_valid', data=df, errorbar='sd', ax=axs[1])
+    axs[1].set_title('Accuracy with standard deviation on validation set')
+    axs[1].set_xlabel('epoch')
+    axs[1].set_ylabel('validation accuracy')
+
+    plt.show()
+
+
+def merge_dfs(my_dir, name):
+    dfs = []
+    for filename in os.listdir(my_dir):
+        if filename.startswith(name):
+            file_path = os.path.join(my_dir, filename)
+            df = pd.read_csv(file_path)
+            dfs.append(df)
+
+    return pd.concat(dfs)
