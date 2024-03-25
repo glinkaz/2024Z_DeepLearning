@@ -1,5 +1,6 @@
 from tensorflow import keras
 import tensorflow as tf
+import pickle
 
 
 class LossHistory(tf.keras.callbacks.Callback):
@@ -29,7 +30,8 @@ class LossHistory(tf.keras.callbacks.Callback):
 def run_test(selected_model, train_ds, valid_ds, test_ds, model_name, test_name,
              preprocessing=tf.keras.layers.Identity(),
              optimizer=tf.keras.optimizers.Adam(), batch_size=16,
-             dropout=tf.keras.layers.Identity()):
+             dropout=tf.keras.layers.Identity(),
+             save_predictions=False, n_epoch=30):
 
     model = tf.keras.Sequential([
         preprocessing,
@@ -47,11 +49,17 @@ def run_test(selected_model, train_ds, valid_ds, test_ds, model_name, test_name,
     model.fit(
         train_ds,
         validation_data=valid_ds,
-        epochs=30,
+        epochs=n_epoch,
         batch_size=batch_size,
+        shuffle=False,
         callbacks=[keras.callbacks.EarlyStopping(monitor='val_loss', patience=3), loss_history_callback])
     _, test_acc = model.evaluate(test_ds)
     print("Test accuracy: {:.2f}%".format(test_acc * 100))
-    model.save(f'../models/{model_name}_{test_name}.h5')
+    if save_predictions:
+        predictions = model.predict(test_ds)
+        with open(f'../predictions/pred_{model_name}_{test_name}.pickle', 'wb') as f:
+            pickle.dump(predictions, f)
+    keras.saving.save_model(model, f'../models/{model_name}_{test_name}.h5')
+
 
 
