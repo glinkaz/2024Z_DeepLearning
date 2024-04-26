@@ -16,6 +16,12 @@ def predict_single_audio(model, processor, audio_file_path):
     return transcription
 
 
+def pad_string(s, target_length, fillstr):
+    fill_count = target_length - len(s)
+    s += fillstr * fill_count
+    return s
+
+
 def create_dataset(audio_dir, processor, file_list):
     input_values = []
     labels = []
@@ -28,9 +34,10 @@ def create_dataset(audio_dir, processor, file_list):
         audio, rate = librosa.load(audio_path, sr=16000)
         inputs = processor(audio, return_tensors="pt", padding=True, sampling_rate=16000)
         label = os.path.basename(os.path.dirname(audio_file)).upper()
-
-        # with processor.as_target_processor():
-        #     label = processor(label).input_ids
+        label = pad_string(label, 6, '<pad>')
+        print('s')
+        with processor.as_target_processor():
+            label = processor(label, return_tensors="pt", padding=True).input_ids
         input_values.append(inputs.input_values[0])
         labels.append(label)
 
