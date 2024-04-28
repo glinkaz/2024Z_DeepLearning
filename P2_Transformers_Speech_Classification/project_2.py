@@ -45,39 +45,6 @@ def predict_on_dataset(model, processor, dataset):
     return cer, accuracy
 
 
-def pad_string(s, target_length, fillstr):
-    fill_count = target_length - len(s)
-    s += fillstr * fill_count
-    return s
-
-
-def create_dataset(audio_dir, processor, file_list):
-    input_values = []
-    labels = []
-    with open(f'data/train/{file_list}.txt', 'r') as file:
-        training_list = [line.rstrip() for line in file]
-
-    for audio_file in training_list:
-        audio, rate = librosa.load(os.path.join(audio_dir, audio_file), sr=16000)
-        if len(audio) < 16000:
-            padding = np.zeros(16000 - len(audio))
-            audio = np.concatenate((audio, padding))
-        inputs = processor(audio, return_tensors="pt", padding=True, sampling_rate=16000)
-        if len(inputs.input_values[0]) != 16000:
-            print(audio_dir, audio_file, len(inputs.input_values[0]))
-        input_values.append(inputs.input_values[0])
-
-        label = os.path.basename(os.path.dirname(audio_file)).upper()
-        label = pad_string(label, 6, '<pad>')
-        with processor.as_target_processor():
-            label = processor(label, return_tensors="pt", padding=True).input_ids
-        labels.append(label)
-
-    column_data = {"input_values": input_values, "labels": labels}
-    dataset = Dataset.from_dict(column_data)
-    return dataset
-
-
 def get_available_labels(directory):
     available_labels = [name.upper() for name in os.listdir(directory) if os.path.isdir(os.path.join(directory, name))]
     return available_labels
