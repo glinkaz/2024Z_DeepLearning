@@ -12,7 +12,6 @@ def split_arr(arr):
 def create_silence():
     train_dir = './data/train/audio/'
     for file in os.listdir("./data/train/audio/_background_noise_/"):
-        print(file)
         if ".wav" in file:
             sig, sr = librosa.load("./data/train/audio/_background_noise_/"+file, sr = 16000)
             sig_arr = split_arr(sig)
@@ -21,6 +20,24 @@ def create_silence():
             for ind, arr in enumerate(sig_arr):
                 file_name = "frag%d" %ind + "_%s" %file
                 sf.write(train_dir+"silence/"+file_name, arr, 16000)
+
+
+def create_silence_with_noise():
+    train_dir = './data/train/audio/'
+    silence_files = []
+    for file in os.listdir("./data/train/audio/_background_noise_/"):
+        if ".wav" in file:
+            sig, sr = librosa.load("./data/train/audio/_background_noise_/"+file, sr = 16000)
+            sig_arr = split_arr(sig)
+            for ind, arr in enumerate(sig_arr):
+                noise = np.random.normal(0, np.max(np.abs(arr)), arr.shape)
+                arr = arr + noise
+                file_name = "noise_frag%d" %ind + "_%s" %file
+                sf.write(train_dir+"silence/"+file_name, arr, 16000)
+                silence_files.append("silence/"+file_name)
+    with open('./data/train/silence_for_test.txt', 'w') as f:
+        for item in silence_files:
+            f.write("%s\n" % item)
 
 
 def mix_sounds(sound1, sound2):
@@ -68,3 +85,5 @@ def create_mixed_silence_with_noise():
             for ind, arr in enumerate(sig_arr):
                 file_name = "mixed_noise_frag%d" %ind + "_%s_%s" %(file1, file2)
                 sf.write(train_dir+"silence/"+file_name, arr, 16000)
+
+
