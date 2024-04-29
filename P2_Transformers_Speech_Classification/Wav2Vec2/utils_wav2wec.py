@@ -22,9 +22,9 @@ def predict_single_audio(model, processor, audio_file_path):
 def predict_for_competition_approach_1(model_silence_detection, model_speech_classification, processor, audio_dir):
     available_labels = get_available_labels(audio_dir)
     labels_to_classify = ['yes', 'no', 'up', 'down', 'left', 'right', 'on', 'off', 'stop', 'go']
-    with open('./data/test/prediction_approach_1.csv', 'w') as f:
+    with open('../data/test/prediction_approach_1.csv', 'w') as f:
         f.write(f'fname,label\n')
-        for audio_file in os.listdir("./data/test/audio"):
+        for audio_file in os.listdir("../data/test/audio"):
             audio, rate = librosa.load(os.path.join(audio_dir, audio_file), sr=16000)
             inputs = processor(audio, return_tensors="pt", padding=True, sampling_rate=16000)
             with torch.no_grad():

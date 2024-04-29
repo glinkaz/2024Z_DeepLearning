@@ -26,14 +26,14 @@ def train_test_split_silence_detection(file_list='./data/train/silence_detection
     split_idx = int(test_ratio * len(lines))
     test_lines = lines[:split_idx]
     train_lines = lines[split_idx:]
-    with open('./data/train/train_silence_detection_list.txt', 'w') as f:
+    with open('../data/train/train_silence_detection_list.txt', 'w') as f:
         f.writelines(train_lines)
-    with open('./data/train/test_silence_detection_list.txt', 'w') as f:
+    with open('../data/train/test_silence_detection_list.txt', 'w') as f:
         f.writelines(test_lines)
 
 
 def create_approach_2_lists():
-    silence_dir = './data/train/audio/silence/'
+    silence_dir = '../data/train/audio/silence/'
     silence_files = [f"silence/{f}\n" for f in os.listdir(silence_dir) if os.path.isfile(os.path.join(silence_dir, f))]
 
     shuffle(silence_files)
@@ -43,11 +43,11 @@ def create_approach_2_lists():
     silence_valid = silence_files[train_split:valid_split]
     silence_test = silence_files[valid_split:]
 
-    with open('./data/train/training_list.txt', 'r') as f:
+    with open('../data/train/training_list.txt', 'r') as f:
         train_files = f.readlines()
-    with open('./data/train/validation_list.txt', 'r') as f:
+    with open('../data/train/validation_list.txt', 'r') as f:
         valid_files = f.readlines()
-    with open('./data/train/testing_list.txt', 'r') as f:
+    with open('../data/train/testing_list.txt', 'r') as f:
         test_files = f.readlines()
 
     train_files += silence_train

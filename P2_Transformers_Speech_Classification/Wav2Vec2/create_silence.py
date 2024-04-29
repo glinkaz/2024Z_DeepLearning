@@ -10,8 +10,8 @@ def split_arr(arr):
 
 
 def create_silence():
-    train_dir = './data/train/audio/'
-    for file in os.listdir("./data/train/audio/_background_noise_/"):
+    train_dir = '../data/train/audio/'
+    for file in os.listdir("../data/train/audio/_background_noise_/"):
         if ".wav" in file:
             sig, sr = librosa.load("./data/train/audio/_background_noise_/" + file, sr=16000)
             sig_arr = split_arr(sig)
@@ -32,8 +32,8 @@ def mix_sounds(sound1, sound2):
 
 
 def create_mixed_silence():
-    train_dir = './data/train/audio/'
-    files = [file for file in os.listdir("./data/train/audio/_background_noise_/") if ".wav" in file]
+    train_dir = '../data/train/audio/'
+    files = [file for file in os.listdir("../data/train/audio/_background_noise_/") if ".wav" in file]
     for i in range(len(files)):
         for j in range(i + 1, len(files)):
             file1 = files[i]
@@ -50,8 +50,8 @@ def create_mixed_silence():
 
 
 def create_mixed_silence_with_noise():
-    train_dir = './data/train/audio/'
-    files = [file for file in os.listdir("./data/train/audio/_background_noise_/") if ".wav" in file]
+    train_dir = '../data/train/audio/'
+    files = [file for file in os.listdir("../data/train/audio/_background_noise_/") if ".wav" in file]
     for i in range(len(files)):
         for j in range(i + 1, len(files)):
             file1 = files[i]
