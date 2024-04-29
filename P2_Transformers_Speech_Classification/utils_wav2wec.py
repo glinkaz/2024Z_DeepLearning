@@ -1,13 +1,10 @@
 import os
 import csv
-from datasets import Dataset
 import librosa
 import torch
-import numpy as np
-from torch import tensor
-from jiwer import cer, wer
+from jiwer import cer
 import Levenshtein
-from transformers import TrainerCallback, TrainerControl
+from transformers import TrainerCallback
 
 
 # ----------------------------------------------- predictions ----------------------------------------------------------
@@ -20,27 +17,6 @@ def predict_single_audio(model, processor, audio_file_path):
     transcription = processor.decode(predicted_ids[0])
     print(f"Transcription for {audio_file_path}: {transcription}")
     return transcription
-
-
-def predict_on_dataset(model, processor, dataset):
-    predictions = []
-    ground_truths = []
-
-    for data in dataset:
-        inputs = tensor([dataset[0]['input_values']]).to('cuda')
-        with torch.no_grad():
-            logits = model(inputs).logits
-        predicted_ids = torch.argmax(logits, dim=-1)
-        transcription = processor.decode(predicted_ids[0])
-        ground_truths.append(processor.decode(data['labels'][0]))
-        predictions.append(transcription)
-
-    cer_score = cer(ground_truths, predictions)
-    accuracy = sum(1 for true, pred in zip(ground_truths, predictions) if true == pred) / len(ground_truths)
-
-    print("CER:", cer_score)
-    print("Accuracy:", accuracy)
-    return cer, accuracy
 
 
 def predict_for_competition_approach_1(model_silence_detection, model_speech_classification, processor, audio_dir):
@@ -127,8 +103,26 @@ def compute_metrics_with_closest_label(available_labels, predictions, labels):
         closest_label = min(available_labels, key=lambda l: Levenshtein.distance(l, prediction))
         if closest_label == label:
             correct_count += 1
-        total_cer += cer(label, closest_label)
+        else:
+            if len(label) == 0:
+                total_cer += len(closest_label)
+            elif len(closest_label) == 0:
+                total_cer += len(label)
+            else:
+                total_cer += cer(closest_label, label)
 
     accuracy = correct_count / total_count
     cer_score = total_cer / total_count
     return cer_score, accuracy
+
+
+def calculate_cer_for_list(true_strings, predicted_strings):
+    cer_total = 0
+    for true, predicted in zip(true_strings, predicted_strings):
+        if len(true) == 0:
+            cer_total += len(predicted)
+        elif len(predicted) == 0:
+            cer_total += len(true)
+        else:
+            cer_total += cer(true, predicted)
+    return cer_total / len(true_strings)

@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import seaborn as sns
+import matplotlib.colors as colors
 
 def vis_accuracy_cer(metrics_file1_path, metrics_file2_path):
     data1 = pd.read_csv(metrics_file1_path)
@@ -32,6 +33,21 @@ def vis_accuracy_cer(metrics_file1_path, metrics_file2_path):
     plt.tight_layout()
     plt.show()
 
+
+def vis_accuracy_cer_one_file(metrics_file_path):
+    data1 = pd.read_csv(metrics_file_path)
+    plt.figure(figsize=(8, 6))
+    plt.plot(data1['epoch'], data1['accuracy'], label='model without modification', color='mediumblue')
+    plt.plot(data1['epoch'], data1['accuracy_closest'], label='model with modification', color='cornflowerblue')
+
+    plt.xlabel('epoch')
+    plt.ylabel('accuracy')
+    plt.title('Validation data accuracy across epochs')
+    plt.tight_layout()
+    plt.legend()
+    plt.show()
+
+
 def vis_silence_detection_accuracy(metrics_file_path):
     data = pd.read_csv(metrics_file_path)
 
@@ -44,4 +60,12 @@ def vis_silence_detection_accuracy(metrics_file_path):
     plt.ylabel('accuracy')
     plt.title('Validation data accuracy across epochs')
     plt.legend()
+    plt.show()
+
+def show_confusion_matrix(df):
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df, annot=True, fmt='g', cmap='viridis', norm=colors.LogNorm())
+    plt.title("Confusion Matrix")
+    plt.ylabel('True Label')
+    plt.xlabel('Predicted Label')
     plt.show()
