@@ -1,11 +1,11 @@
 import os
-from random import random, shuffle
+from random import random, shuffle, sample
 
 import librosa
 import numpy as np
 from datasets import Dataset
 
-
+# ----------------------------------------------- create lists ---------------------------------------------------------
 def create_silence_detection_list(audio_dir='./data/train/audio/', output_file='./data/train/silence_detection_list.txt'):
     folders = [folder for folder in os.listdir(audio_dir) if folder not in ['_background_noise_', '.DS_Store']]
     with open(output_file, 'w') as f:
@@ -14,7 +14,7 @@ def create_silence_detection_list(audio_dir='./data/train/audio/', output_file='
             if folder == 'silence':
                 selected_files = files
             else:
-                selected_files = random.sample(files, min(80, len(files)))
+                selected_files = sample(files, min(80, len(files)))
             for file in selected_files:
                 f.write(f'{folder}\\{file}\n')
 
@@ -32,6 +32,7 @@ def train_test_split_silence_detection(file_list='./data/train/silence_detection
         f.writelines(test_lines)
 
 
+# ----------------------------------------------- create datasets ------------------------------------------------------
 def pad_string(s, target_length, fillstr):
     fill_count = target_length - len(s)
     s += fillstr * fill_count
